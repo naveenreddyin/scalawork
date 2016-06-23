@@ -1,3 +1,4 @@
+project/*
 .sbtserver
 logs
 target
