@@ -19,7 +19,7 @@ class Authentication @Inject() extends Controller {
    * a path of `/`.
    */
   def login = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.login())
   }
 
 }

@@ -19,3 +19,4 @@ POST		/create		controllers.FormDemoController.create
 # Home page
 POST    /insert/cat                 controllers.FormDemoController.insertCat
 GET     /cat                      controllers.FormDemoController.catIndex
+GET	/login	controllers.Authentication.login
