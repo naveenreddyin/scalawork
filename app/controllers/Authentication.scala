@@ -22,4 +22,9 @@ class Authentication @Inject() extends Controller {
     Ok(views.html.login())
   }
 
+  def loginSubmit = Action {
+  	implicit request => 
+  	Ok(request)
+  }
+
 }

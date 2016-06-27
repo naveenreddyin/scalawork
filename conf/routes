@@ -20,3 +20,5 @@ POST		/create		controllers.FormDemoController.create
 POST    /insert/cat                 controllers.FormDemoController.insertCat
 GET     /cat                      controllers.FormDemoController.catIndex
 GET	/login	controllers.Authentication.login
+
+POST /authenticate controllers.Authentication.loginSubmit
