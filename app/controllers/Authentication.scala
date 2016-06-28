@@ -30,4 +30,8 @@ class Authentication @Inject() extends Controller {
   	Ok("Hello")
   }
 
+  def register = Action{
+  	Ok(views.html.register())
+  }
+
 }
