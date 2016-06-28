@@ -24,7 +24,10 @@ class Authentication @Inject() extends Controller {
 
   def loginSubmit = Action {
   	implicit request => 
-  	Ok(request)
+  	// val maybeFoo = request.body.asFormUrlEncoded.get("password").lift(0) // returns an Option[String]
+  	// val something = maybeFoo map {_.toString} getOrElse 0
+  	// println(something)
+  	Ok("Hello")
   }
 
 }
