@@ -18,13 +18,16 @@ import models.UserProfile
 class Authentication @Inject() extends Controller {
 
   val registerForm = Form(
-      tuple(
+    tuple(
+      "user" -> mapping(
         "email" -> nonEmptyText,
-        "password" -> nonEmptyText,
-        "firstname" -> nonEmptyText,
-        "lastname" -> nonEmptyText,
-        "gender" -> number
-        )
+        "password" -> nonEmptyText
+        )(User.apply)(User.unapply),
+      "profile" -> mapping(
+        "firstname"->nonEmptyText,
+        "lastname"->nonEmptyText,
+        "gender" -> ignored(0)
+      )(UserProfile.apply)(UserProfile.unapply))
     )
 
   /**
@@ -49,13 +52,13 @@ class Authentication @Inject() extends Controller {
   	Ok(views.html.register())
   }
 
-  def registerSubmit = Action(parse.form(registerForm)){
+  def registerSubmit = Action{
     implicit request =>
-  val userData = request.body
+//  val userData = request.body
 
-    // Redirect(routes.Authentication.register)
-
-    Ok(userData.email)
+     Redirect(routes.Authentication.register)
+//    println(userData._1.email)
+    Ok("hello")
   }
 
   def forgotPassword = Action{
