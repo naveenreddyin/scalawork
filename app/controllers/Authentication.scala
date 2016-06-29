@@ -34,4 +34,8 @@ class Authentication @Inject() extends Controller {
   	Ok(views.html.register())
   }
 
+  def forgotPassword = Action{
+  	Ok(views.html.forgot_password())
+  }
+
 }
