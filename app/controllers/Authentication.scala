@@ -3,6 +3,11 @@ package controllers
 import javax.inject._
 import play.api._
 import play.api.mvc._
+import play.api.data._
+import play.api.data.Forms._
+
+import models.User
+import models.UserProfile
 
 
 /**
@@ -11,6 +16,16 @@ import play.api.mvc._
  */
 @Singleton
 class Authentication @Inject() extends Controller {
+
+  val registerForm = Form(
+      tuple(
+        "email" -> nonEmptyText,
+        "password" -> nonEmptyText,
+        "firstname" -> nonEmptyText,
+        "lastname" -> nonEmptyText,
+        "gender" -> number
+        )
+    )
 
   /**
    * Create an Action to render an HTML page with a welcome message.
@@ -32,6 +47,15 @@ class Authentication @Inject() extends Controller {
 
   def register = Action{
   	Ok(views.html.register())
+  }
+
+  def registerSubmit = Action(parse.form(registerForm)){
+    implicit request =>
+  val userData = request.body
+
+    // Redirect(routes.Authentication.register)
+
+    Ok(userData.email)
   }
 
   def forgotPassword = Action{

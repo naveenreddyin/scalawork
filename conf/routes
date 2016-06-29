@@ -25,4 +25,6 @@ POST /authenticate controllers.Authentication.loginSubmit
 
 GET /register controllers.Authentication.register
 
+POST /register-submit controllers.Authentication.registerSubmit
+
 GET /forgot-password controllers.Authentication.forgotPassword
