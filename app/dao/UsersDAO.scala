@@ -25,4 +25,7 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
     def * = (email, password) <> (User.tupled, User.unapply _)
   }
+
+
+  
 }

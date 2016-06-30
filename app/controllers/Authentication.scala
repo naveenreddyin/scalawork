@@ -5,6 +5,9 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import models.User
 import models.UserProfile
@@ -18,16 +21,15 @@ import models.UserProfile
 class Authentication @Inject() extends Controller {
 
   val registerForm = Form(
-    tuple(
-      "user" -> mapping(
-        "email" -> nonEmptyText,
-        "password" -> nonEmptyText
-        )(User.apply)(User.unapply),
-      "profile" -> mapping(
+    mapping(
         "firstname"->nonEmptyText,
         "lastname"->nonEmptyText,
-        "gender" -> ignored(0)
-      )(UserProfile.apply)(UserProfile.unapply))
+        "gender" -> ignored(0),
+        "user_id" -> mapping(
+          "email" -> nonEmptyText,
+          "password" -> nonEmptyText
+        )  (User.apply)(User.unapply)
+      )(UserProfile.apply)(UserProfile.unapply)
     )
 
   /**
@@ -49,16 +51,23 @@ class Authentication @Inject() extends Controller {
   }
 
   def register = Action{
-  	Ok(views.html.register())
+  	Ok(views.html.register(registerForm))
   }
 
   def registerSubmit = Action{
     implicit request =>
-//  val userData = request.body
-
-     Redirect(routes.Authentication.register)
-//    println(userData._1.email)
-    Ok("hello")
+    registerForm.bindFromRequest.fold(
+      formWithErrors => {
+        // binding failure, you retrieve the form containing errors:
+        println(formWithErrors)
+        BadRequest(views.html.register(formWithErrors))
+      },
+      userData => {
+        /* binding success, you get the actual value. */
+        println(userData)
+        Redirect(routes.Authentication.login())
+      }
+    )
   }
 
   def forgotPassword = Action{
