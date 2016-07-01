@@ -21,15 +21,17 @@ import models.UserProfile
 class Authentication @Inject() extends Controller {
 
   val registerForm = Form(
-    mapping(
-        "firstname"->nonEmptyText,
-        "lastname"->nonEmptyText,
-        "gender" -> ignored(0),
-        "user_id" -> mapping(
+    tuple(
+          "user" -> mapping(
           "email" -> nonEmptyText,
           "password" -> nonEmptyText
-        )  (User.apply)(User.unapply)
-      )(UserProfile.apply)(UserProfile.unapply)
+        )  (User.apply)(User.unapply),
+        "profile" -> mapping(
+          "firstname"->nonEmptyText,
+          "lastname"->nonEmptyText,
+          "gender" -> ignored(0),
+          "user_id" -> ignored(0L)
+        )(UserProfile.apply)(UserProfile.unapply))
     )
 
   /**

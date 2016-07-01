@@ -1,5 +1,5 @@
 @import b3.vertical.fieldConstructor
-@(userForm: Form[UserProfile])(implicit messages: Messages)
+@(userForm: Form[(User, UserProfile)])(implicit messages: Messages)
 @main("Register") {
 	<!-- REGISTRATION FORM -->
 <div class="text-center" style="padding:50px 0">
@@ -14,27 +14,29 @@
 						@*<label for="reg_email" class="sr-only">Email</label>*@
 						@*<input type="text" class="form-control" id="reg_email" name="email" placeholder="email">*@
 					@*</div>*@
-					@b3.email( userForm("user_id.email"), '_label -> "Email", 'placeholder -> "example@mail.com" )
+					@b3.email( userForm("user.email"), '_label -> "Email", 'placeholder -> "example@mail.com" )
 					@*<div class="form-group">*@
 						@*<label for="reg_password" class="sr-only">Password</label>*@
 						@*<input type="password" class="form-control" id="reg_password" name="password" placeholder="password">*@
 					@*</div>*@
-					@b3.password( userForm("user_id.password"), '_label -> "Password", 'placeholder -> "Password" )
+					@b3.password( userForm("user.password"), '_label -> "Password", 'placeholder -> "Password" )
 					<div class="form-group">
 						<label for="password_confirm" class="sr-only">Password Confirm</label>
 						<input type="password" class="form-control" id="password_confirm" name="reg_password_confirm" placeholder="confirm password">
 					</div>
 					
 					
-					<div class="form-group">
-						<label for="firstname" class="sr-only">First Name</label>
-						<input type="text" class="form-control" id="firstname" name="firstname" placeholder="First Name">
-					</div>
+					@*<div class="form-group">*@
+						@*<label for="firstname" class="sr-only">First Name</label>*@
+						@*<input type="text" class="form-control" id="firstname" name="firstname" placeholder="First Name">*@
+					@*</div>*@
+					@b3.text( userForm("profile.firstname"), '_label -> "Firstname", '_help -> "Enter your first name." )
 
-					<div class="form-group">
-						<label for="lastname" class="sr-only">Last Name</label>
-						<input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last Name">
-					</div>
+					@*<div class="form-group">*@
+						@*<label for="lastname" class="sr-only">Last Name</label>*@
+						@*<input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last Name">*@
+					@*</div>*@
+					@b3.text( userForm("profile.lastname"), '_label -> "Lastname", '_help -> "Enter your last name." )
 					
 					<div class="form-group login-group-checkbox">
 						<input type="radio" class="" name="gender" id="male" placeholder="username">
