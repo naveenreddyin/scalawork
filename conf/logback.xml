@@ -32,6 +32,10 @@
   <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
   <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
   <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
+  <logger name="slick.jdbc.JdbcBackend.statement"  level="DEBUG" />
+  <logger name="slick.jdbc.JdbcBackend.statement"  level="ERROR" />
+  <logger name="slick.jdbc.JdbcBackend.statement"  level="INFO" />
+  <logger name="logger.org.jdbcdslog.StatementLogger"  level="INFO" />
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />

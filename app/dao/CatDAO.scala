@@ -16,7 +16,10 @@ class CatDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
 
   def all(): Future[Seq[Cat]] = db.run(Cats.result)
 
-  def insert(cat: Cat): Future[Unit] = db.run(Cats += cat).map { _ => () }
+  def insert(cat: Cat): Future[Unit] = {
+    println("coming inside cat user dao insert")
+    db.run(Cats += cat).map { _ => () }
+  }
 
   private class CatsTable(tag: Tag) extends Table[Cat](tag, "CAT") {
 

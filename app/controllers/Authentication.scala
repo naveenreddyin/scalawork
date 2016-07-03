@@ -1,6 +1,9 @@
 package controllers
 
+import java.sql.Timestamp
+import java.util.{Calendar, Date}
 import javax.inject._
+
 import play.api._
 import play.api.mvc._
 import play.api.data._
@@ -8,9 +11,8 @@ import play.api.data.Forms._
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import models.User
-import models.UserProfile
+import models.{Cat, User, UserProfile}
+import dao.{CatDAO, UsersDAO}
 
 
 /**
@@ -18,13 +20,16 @@ import models.UserProfile
  * application's home page.
  */
 @Singleton
-class Authentication @Inject() extends Controller {
-
+class Authentication @Inject() (userDao: UsersDAO) extends Controller {
+  val date = new Date()
+  val currentTimestamp= new Timestamp(date.getTime());
   val registerForm = Form(
     tuple(
           "user" -> mapping(
           "email" -> nonEmptyText,
-          "password" -> nonEmptyText
+          "password" -> nonEmptyText,
+          "created_at" -> ignored(currentTimestamp),
+          "updated_at" -> ignored(currentTimestamp)
         )  (User.apply)(User.unapply),
         "profile" -> mapping(
           "firstname"->nonEmptyText,
@@ -67,6 +72,7 @@ class Authentication @Inject() extends Controller {
       userData => {
         /* binding success, you get the actual value. */
         println(userData)
+        userDao.insert(userData._1)
         Redirect(routes.Authentication.login())
       }
     )
