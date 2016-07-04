@@ -19,7 +19,7 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   def all(): Future[Seq[User]] = db.run(Users.result)
 
-  def insert(user: User): Future[Unit] = {
+  def insert(user: User): Future[User] = {
     println("coming inside insert of user dao")
     println(user)
     db.run(Users += user).map { _ => user }
@@ -31,6 +31,7 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     def password = column[String]("password")
     def created_at = column[Timestamp]("created_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
     def updated_at = column[Timestamp]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+    def idx = index("email_UNIQUE", email, unique = true)
 
     def * = (email, password, created_at, updated_at) <> (User.tupled, User.unapply _)
   }

@@ -72,7 +72,13 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
       userData => {
         /* binding success, you get the actual value. */
         println(userData)
-        userDao.insert(userData._1)
+        val f = userDao.insert(userData._1)
+        f.onSuccess{
+          case s =>println(s"Restult: $s")
+        }
+        f.onFailure{
+          case e => println(s"failed $e")
+        }
         Redirect(routes.Authentication.login())
       }
     )
