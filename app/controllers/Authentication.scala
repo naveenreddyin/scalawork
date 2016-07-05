@@ -26,9 +26,10 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
   val registerForm = Form(
     tuple(
           "user" -> mapping(
-          "email" -> nonEmptyText,
-          "password" -> nonEmptyText,
-          "created_at" -> ignored(currentTimestamp),
+            "uid" -> optional(number),
+            "email" -> nonEmptyText,
+            "password" -> nonEmptyText,
+            "created_at" -> ignored(currentTimestamp),
           "updated_at" -> ignored(currentTimestamp)
         )  (User.apply)(User.unapply),
         "profile" -> mapping(
