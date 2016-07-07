@@ -44,7 +44,9 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
     tuple(
       "username" -> nonEmptyText,
       "password" -> nonEmptyText
-    )
+    ).verifying("This is wrong", fields => fields match{
+      case (username, password) => false
+    })
   )
 
 
@@ -70,7 +72,8 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
         BadRequest(views.html.login(hasErrors))
       },
       user => {
-        userDao.authenticate(user._1, user._2)
+        val query = userDao.authenticate(user._1, user._2)
+
         Redirect(routes.Authentication.login())
       }
     )

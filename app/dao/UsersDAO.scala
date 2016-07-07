@@ -38,9 +38,15 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     println(Users.insertStatement)
   }
 
-  def authenticate(username: String, password: String): Unit = {
-    val result = Users.filter(u => u.email === username && u.password === password.bcrypt)
-    println(result)
+  def authenticate(username: String, password: String): Future[Seq[User]] = {
+//    val query = Users.filter(_.email === username).filter(_.password === password.bcrypt)
+//    val action = query.result
+//    val result: Future[Seq[User]] = db.run(action)
+//    val sql = action.statements.head
+//    println(sql)
+    val query = Users.filter(u => u.email === username && u.password === password.bcrypt).result
+    val f: Future[Seq[User]] = db.run(query)
+    f
 
   }
 
