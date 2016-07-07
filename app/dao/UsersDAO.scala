@@ -12,6 +12,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import slick.driver.JdbcProfile
 import slick.profile.SqlProfile.ColumnOption.SqlType
 
+import com.github.t3hnar.bcrypt._
+
 class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
@@ -19,11 +21,14 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   def all(): Future[Seq[User]] = db.run(Users.result)
 
-  def insert(user: User): Future[Int] = {
+  def insert(user: User): Future[Any] = {
     println("coming inside insert of user dao")
     println(user)
 //    insertUP(user)
-    db.run((Users returning Users.map(_.uid)) += user).map { i => i }
+    val hashPassword = user.password.bcrypt
+    val updatedUser = user.copy(password = hashPassword)
+
+    db.run((Users returning Users.map(_.uid)) += updatedUser)
   }
   def insertUP(user: User) = {
     DBIO.seq(
@@ -32,9 +37,16 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     )
     println(Users.insertStatement)
   }
+
+  def authenticate(username: String, password: String): Unit = {
+    val result = Users.filter(u => u.email === username && u.password === password.bcrypt)
+    println(result)
+
+  }
+
   private class UsersTable(tag: Tag) extends Table[User](tag, "users") {
 
-    def uid = column[Int]("uid", O.AutoInc, O.PrimaryKey)
+    def uid = column[Int]("uid", O.PrimaryKey, O.AutoInc, O.SqlType("INT"))
     def email = column[String]("email")
     def password = column[String]("password")
     def created_at = column[Timestamp]("created_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))

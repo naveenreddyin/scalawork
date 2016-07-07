@@ -27,7 +27,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
     tuple(
           "user" -> mapping(
             "uid" -> optional(number),
-            "email" -> nonEmptyText,
+            "email" -> email,
             "password" -> nonEmptyText,
             "created_at" -> ignored(currentTimestamp),
           "updated_at" -> ignored(currentTimestamp)
@@ -40,6 +40,14 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
         )(UserProfile.apply)(UserProfile.unapply))
     )
 
+  val loginForm = Form(
+    tuple(
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText
+    )
+  )
+
+
   /**
    * Create an Action to render an HTML page with a welcome message.
    * The configuration in the `routes` file means that this method
@@ -47,7 +55,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
    * a path of `/`.
    */
   def login = Action {
-    Ok(views.html.login())
+    Ok(views.html.login(loginForm))
   }
 
   def loginSubmit = Action {
@@ -55,7 +63,17 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
   	// val maybeFoo = request.body.asFormUrlEncoded.get("password").lift(0) // returns an Option[String]
   	// val something = maybeFoo map {_.toString} getOrElse 0
   	// println(something)
-  	Ok("Hello")
+  	loginForm.bindFromRequest.fold(
+      hasErrors => {
+        println(hasErrors)
+
+        BadRequest(views.html.login(hasErrors))
+      },
+      user => {
+        userDao.authenticate(user._1, user._2)
+        Redirect(routes.Authentication.login())
+      }
+    )
   }
 
   def register = Action{
