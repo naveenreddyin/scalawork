@@ -50,9 +50,23 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
         val query = userDao.authenticate(username, password)
 
         query onComplete  {
-          case Success(Option[User]) => println("Success")
-          case Failure(_) => println("Failed ")
+          case Success(Some(user)) => {
+            println("Success "+ user.email+ " "+query.map(_.isDefined))
+
+            true
+          }
+          case Success(None) => {
+            println("User couldnt be found.")
+            false
+          }
+          case Failure(_) => {
+            println("Failed ")
+            false
+          }
         }
+//        query onSuccess{
+//          case i => println(s"Result: $i "+query.map(_.isDefined))
+//        }
 
         false
       }
@@ -82,7 +96,6 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
         BadRequest(views.html.login(hasErrors))
       },
       user => {
-        val query = userDao.authenticate(user._1, user._2)
 
         Redirect(routes.Authentication.login())
       }

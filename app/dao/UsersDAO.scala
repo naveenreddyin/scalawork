@@ -53,7 +53,8 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 //      u <- Users if u.email === username
 //    } yield u
 //    query.result
-    db.run(Users.filter(_.email === username).result).map(_.headOption)
+    val query = db.run(Users.filter(_.email === username).result).map(_.headOption)
+    query
   }
 
   private class UsersTable(tag: Tag) extends Table[User](tag, "users") {
