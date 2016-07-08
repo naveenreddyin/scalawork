@@ -4,8 +4,7 @@ import java.sql.Timestamp
 import java.util.{Calendar, Date}
 import javax.inject._
 
-import akka.actor.FSM.Failure
-import akka.actor.Status.Success
+import scala.util.{Success, Failure}
 import play.api._
 import play.api.mvc._
 import play.api.data._
@@ -15,8 +14,6 @@ import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.{Cat, User, UserProfile}
 import dao.{CatDAO, UsersDAO}
-
-import scala.Option
 
 
 /**
@@ -52,8 +49,9 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
       case (username, password) => {
         val query = userDao.authenticate(username, password)
 
-        query onSuccess {
-          case s => println(s"Restult: $s")
+        query onComplete  {
+          case Success(Option[User]) => println("Success")
+          case Failure(_) => println("Failed ")
         }
 
         false
