@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.{Calendar, Date}
 import javax.inject._
 
-import scala.util.{Success, Failure}
+import scala.util.{Failure, Success}
 import play.api._
 import play.api.mvc._
 import play.api.data._
@@ -14,6 +14,10 @@ import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.{Cat, User, UserProfile}
 import dao.{CatDAO, UsersDAO}
+
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
 
 
 /**
@@ -48,27 +52,29 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
     ) verifying("Wrong username or password!", fields => fields match{
       case (username, password) => {
         val query = userDao.authenticate(username, password)
-
-        query onComplete  {
-          case Success(Some(user)) => {
-            println("Success "+ user.email+ " "+query.map(_.isDefined))
-
-            true
-          }
-          case Success(None) => {
-            println("User couldnt be found.")
-            false
-          }
-          case Failure(_) => {
-            println("Failed ")
-            false
-          }
-        }
+//        var flag: Boolean = false
+//        query onComplete  {
+//          case Success(Some(user)) => {
+//            println("Success "+ user.email+ " "+query.map(_.isDefined))
+//
+//            flag = true
+//          }
+//          case Success(None) => {
+//            println("User couldnt be found.")
+//            flag = false
+//          }
+//          case Failure(_) => {
+//            println("Failed ")
+//            flag = false
+//
+//          }
+//        }
 //        query onSuccess{
 //          case i => println(s"Result: $i "+query.map(_.isDefined))
 //        }
-
-        false
+//        println(flag)
+        val result = Await.result(query.map(_.isDefined), 30 seconds)
+        result
       }
     })
   )
