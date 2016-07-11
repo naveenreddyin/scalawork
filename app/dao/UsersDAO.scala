@@ -11,6 +11,8 @@ import play.api.db.slick.HasDatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import slick.driver.JdbcProfile
 import slick.profile.SqlProfile.ColumnOption.SqlType
+import slick.driver.MySQLDriver.api._
+
 
 import com.github.t3hnar.bcrypt._
 
@@ -21,7 +23,7 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   def all(): Future[Seq[User]] = db.run(Users.result)
 
-  def insert(user: User): Future[Any] = {
+  def insert(user: User): Future[Int] = {
     println("coming inside insert of user dao")
     println(user)
 //    insertUP(user)
@@ -29,13 +31,6 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     val updatedUser = user.copy(password = hashPassword)
 
     db.run((Users returning Users.map(_.uid)) += updatedUser)
-  }
-  def insertUP(user: User) = {
-    DBIO.seq(
-      Users += user
-
-    )
-    println(Users.insertStatement)
   }
 
   def authenticate(username: String, password: String): Future[Option[User]] = {
@@ -53,7 +48,9 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 //      u <- Users if u.email === username
 //    } yield u
 //    query.result
-    val query = db.run(Users.filter(_.email === username).result).map(_.headOption)
+//    val query = db.run(Users.filter(x => x.email === username && password.isBcrypted(x.password.toString())).result).map(_.headOption)
+    val query = db.run(Users.filter(_.email === username).result.map(_.headOption.filter(user => password.isBcrypted(user.password)))).map(_.headOption)
+
     query
   }
 

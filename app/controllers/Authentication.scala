@@ -69,11 +69,12 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
 //
 //          }
 //        }
-//        query onSuccess{
-//          case i => println(s"Result: $i "+query.map(_.isDefined))
-//        }
+        query onSuccess{
+          case i => println(s"Result: $i "+query.map(_.isDefined))
+        }
 //        println(flag)
         val result = Await.result(query.map(_.isDefined), 30 seconds)
+
         result
       }
     })
