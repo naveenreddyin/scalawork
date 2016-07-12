@@ -46,7 +46,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
           "firstname"->nonEmptyText,
           "lastname"->nonEmptyText,
           "gender" -> ignored(0),
-          "user_id" -> ignored(0L)
+          "user_id" -> ignored(0)
         )(UserProfile.apply)(UserProfile.unapply))
     )
 

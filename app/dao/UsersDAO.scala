@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import scala.concurrent.{Await, Future}
 import javax.inject.Inject
 
-import models.User
+import models.{User, UserProfile}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.slick.HasDatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -18,6 +18,8 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
   import driver.api._
 
   private val Users = TableQuery[UsersTable]
+  private val UsersProfile = TableQuery[UserProfileTable]
+
 
   def all(): Future[Seq[User]] = db.run(Users.result)
 
@@ -28,8 +30,14 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     val hashPassword = user.password.bcrypt
     val updatedUser = user.copy(password = hashPassword)
 
-    db.run((Users returning Users.map(_.uid)) += updatedUser)
+    val query = db.run((Users returning Users.map(_.uid)) += updatedUser)
+//    val uid = Await.result(query, 30 seconds)
+//    println(s"UID ---------> $uid")
+    query
   }
+
+
+
 
   def findByEmail(email: String): Option[User] = {
 
@@ -74,6 +82,18 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     def idx = index("email_UNIQUE", email, unique = true)
 
     def * = (uid.?, email, password, created_at, updated_at) <> (User.tupled, User.unapply _)
+  }
+
+  private class UserProfileTable(tag: Tag) extends Table[UserProfile](tag, "user_profile"){
+
+    def firstname = column[String]("firstname")
+    def lastname = column[String]("lastname")
+    def gender = column[Int]("gender")
+    def user_id = column[Int]("user_id")
+
+    def * = (firstname, lastname, gender, user_id) <> (UserProfile.tupled, UserProfile.unapply)
+
+    def fk_user_id = foreignKey("fk_user_id", user_id, Users)(_.uid)
   }
 
 
