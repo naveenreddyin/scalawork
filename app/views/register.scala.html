@@ -6,6 +6,13 @@
 	<div class="logo">register</div>
 	<!-- Main Form -->
 	<div class="login-form-1">
+		@if(userForm.hasErrors) {
+			<ul>
+			@for(error <- userForm.errors) {
+				<li>@Messages(error.messages, error.args)</li>
+			}
+			</ul>
+		}
 		<form id="register-form" class="text-left" method="POST" action="@routes.Authentication.registerSubmit">
 			<div class="login-form-main-message"></div>
 			<div class="main-login-form">
@@ -14,7 +21,7 @@
 						@*<label for="reg_email" class="sr-only">Email</label>*@
 						@*<input type="text" class="form-control" id="reg_email" name="email" placeholder="email">*@
 					@*</div>*@
-					@b3.email( userForm("user.email"), '_label -> "Email", 'placeholder -> "example@mail.com" )
+					@b3.email( userForm("user.email"), '_label -> "Email", 'placeholder -> "example@mail.com", '_error -> userForm("user.email").error)
 					@*<div class="form-group">*@
 						@*<label for="reg_password" class="sr-only">Password</label>*@
 						@*<input type="password" class="form-control" id="reg_password" name="password" placeholder="password">*@

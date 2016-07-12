@@ -36,7 +36,12 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
             "password" -> nonEmptyText,
             "created_at" -> ignored(currentTimestamp),
           "updated_at" -> ignored(currentTimestamp)
-        )  (User.apply)(User.unapply),
+        )  (User.apply)(User.unapply).verifying("Email already exists.", fields => fields match {
+            case user => {
+              val result = userDao.findByEmail(user.email)
+              !result.isDefined
+            }
+          }),
         "profile" -> mapping(
           "firstname"->nonEmptyText,
           "lastname"->nonEmptyText,
@@ -52,23 +57,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
     ) verifying("Wrong username or password!", fields => fields match{
       case (username, password) => {
         val query = userDao.authenticate(username, password)
-//        var flag: Boolean = false
-//        query onComplete  {
-//          case Success(Some(user)) => {
-//            println("Success "+ user.email+ " "+query.map(_.isDefined))
-//
-//            flag = true
-//          }
-//          case Success(None) => {
-//            println("User couldnt be found.")
-//            flag = false
-//          }
-//          case Failure(_) => {
-//            println("Failed ")
-//            flag = false
-//
-//          }
-//        }
+
         query onSuccess{
           case i => println(s"Result: $i "+query.map(_.isDefined))
         }
@@ -103,7 +92,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
         BadRequest(views.html.login(hasErrors))
       },
       user => {
-
+        userDao.findByEmail(user._1)
         Redirect(routes.Authentication.login())
       }
     )

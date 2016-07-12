@@ -2,7 +2,7 @@ package dao
 
 import java.sql.Timestamp
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import javax.inject.Inject
 
 import models.User
@@ -11,9 +11,7 @@ import play.api.db.slick.HasDatabaseConfigProvider
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import slick.driver.JdbcProfile
 import slick.profile.SqlProfile.ColumnOption.SqlType
-import slick.driver.MySQLDriver.api._
-
-
+import scala.concurrent.duration._
 import com.github.t3hnar.bcrypt._
 
 class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
@@ -31,6 +29,18 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     val updatedUser = user.copy(password = hashPassword)
 
     db.run((Users returning Users.map(_.uid)) += updatedUser)
+  }
+
+  def findByEmail(email: String): Option[User] = {
+
+    val query = for {
+      u <- Users if u.email === email
+    } yield u
+
+    val f: Future[Option[User]] = db.run(query.result).map(_.headOption)
+    val result = Await.result(f, 30 seconds)
+    println(result.isDefined)
+    result
   }
 
   def authenticate(username: String, password: String): Future[Option[User]] = {
