@@ -31,8 +31,7 @@
 						<label for="password_confirm" class="sr-only">Password Confirm</label>
 						<input type="password" class="form-control" id="password_confirm" name="reg_password_confirm" placeholder="confirm password">
 					</div>
-					
-					
+
 					@*<div class="form-group">*@
 						@*<label for="firstname" class="sr-only">First Name</label>*@
 						@*<input type="text" class="form-control" id="firstname" name="firstname" placeholder="First Name">*@
@@ -44,14 +43,16 @@
 						@*<input type="text" class="form-control" id="lastname" name="lastname" placeholder="Last Name">*@
 					@*</div>*@
 					@b3.text( userForm("profile.lastname"), '_label -> "Lastname", '_help -> "Enter your last name." )
-					
-					<div class="form-group login-group-checkbox">
-						<input type="radio" class="" name="gender" id="male" placeholder="username">
-						<label for="male">male</label>
-						
-						<input type="radio" class="" name="gender" id="female" placeholder="username">
-						<label for="female">female</label>
-					</div>
+
+					@*<div class="form-group login-group-checkbox">*@
+						@*<input type="radio" class="" name="gender" id="male" placeholder="username">*@
+						@*<label for="male">male</label>*@
+						@**@
+						@*<input type="radio" class="" name="gender" id="female" placeholder="username">*@
+						@*<label for="female">female</label>*@
+					@*</div>*@
+						@*// an inline radio within a vertical or horizontal form*@
+					@b3.radio( userForm("profile.gender"), options = Seq("0" -> "Male", "1" -> "Female"), '_label -> "", '_inline -> true, '_class -> "login-group-checkbox form-group" )
 					
 					<div class="form-group login-group-checkbox">
 						<input type="checkbox" class="" id="reg_agree" name="reg_agree">

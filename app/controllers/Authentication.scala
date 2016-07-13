@@ -43,6 +43,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
             }
           }),
         "profile" -> mapping(
+          "upid" -> optional(number),
           "firstname"->nonEmptyText,
           "lastname"->nonEmptyText,
           "gender" -> ignored(0),
@@ -113,7 +114,7 @@ class Authentication @Inject() (userDao: UsersDAO) extends Controller {
       userData => {
         /* binding success, you get the actual value. */
         println(userData)
-        val f = userDao.insert(userData._1)
+        val f = userDao.insert(userData._1, userData._2)
         f.onSuccess{
           case s =>println(s"Restult: $s")
         }

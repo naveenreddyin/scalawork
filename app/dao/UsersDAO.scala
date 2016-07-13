@@ -23,20 +23,33 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   def all(): Future[Seq[User]] = db.run(Users.result)
 
-  def insert(user: User): Future[Int] = {
-    println("coming inside insert of user dao")
-    println(user)
-//    insertUP(user)
+//  def insert(user: User): Future[Int] = {
+//    println("coming inside insert of user dao")
+//    println(user)
+////    insertUP(user)
+//    val hashPassword = user.password.bcrypt
+//    val updatedUser = user.copy(password = hashPassword)
+//
+//    val query = db.run((Users returning Users.map(_.uid)) += updatedUser)
+////    val uid = Await.result(query, 30 seconds)
+////    println(s"UID ---------> $uid")
+//    query
+//  }
+
+  def insert(user: User, profile: UserProfile): Future[Int] = {
     val hashPassword = user.password.bcrypt
-    val updatedUser = user.copy(password = hashPassword)
+    val updatedUser  = user.copy(password = hashPassword)
 
-    val query = db.run((Users returning Users.map(_.uid)) += updatedUser)
-//    val uid = Await.result(query, 30 seconds)
-//    println(s"UID ---------> $uid")
-    query
+    val insertUser = (Users returning Users.map(_.uid)) += updatedUser
+    def insertUserProfile(updatedUserProfile: UserProfile) = (UsersProfile returning UsersProfile.map(_.upid)) += updatedUserProfile
+
+    val insertUserThenProfile = for {
+      createdUserId        <- insertUser
+      createdUserProfileId <- insertUserProfile(UserProfile(Some(0), profile.firstname, profile.lastname, gender = 0, user_id = createdUserId))
+    } yield createdUserProfileId
+
+    db.run(insertUserThenProfile.transactionally)
   }
-
-
 
 
   def findByEmail(email: String): Option[User] = {
@@ -74,7 +87,7 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   private class UsersTable(tag: Tag) extends Table[User](tag, "users") {
 
-    def uid = column[Int]("uid", O.PrimaryKey, O.AutoInc, O.SqlType("INT"))
+    def uid = column[Int]("uid", O.PrimaryKey, O.AutoInc, O.SqlType("INT"), O.Default(0))
     def email = column[String]("email")
     def password = column[String]("password")
     def created_at = column[Timestamp]("created_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
@@ -86,12 +99,13 @@ class UsersDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
   private class UserProfileTable(tag: Tag) extends Table[UserProfile](tag, "user_profile"){
 
+    def upid= column[Int]("upid", O.PrimaryKey, O.AutoInc, O.SqlType("INT"), O.Default(0))
     def firstname = column[String]("firstname")
     def lastname = column[String]("lastname")
     def gender = column[Int]("gender")
     def user_id = column[Int]("user_id")
 
-    def * = (firstname, lastname, gender, user_id) <> (UserProfile.tupled, UserProfile.unapply)
+    def * = (upid.?, firstname, lastname, gender, user_id) <> (UserProfile.tupled, UserProfile.unapply)
 
     def fk_user_id = foreignKey("fk_user_id", user_id, Users)(_.uid)
   }
